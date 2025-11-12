@@ -11,6 +11,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailAddress = document.getElementById('emailAddress');
     const emailStatus = document.getElementById('emailStatus');
     const emailInboxLink = document.getElementById('emailInboxLink');
+    const themeToggle = document.getElementById('themeToggle');
+    const rootElement = document.documentElement;
+    const themeStorageKey = 'preferred-theme';
+
+    const readStoredTheme = () => {
+        try {
+            return localStorage.getItem(themeStorageKey);
+        } catch (error) {
+            return null;
+        }
+    };
+
+    const storeTheme = (theme) => {
+        try {
+            localStorage.setItem(themeStorageKey, theme);
+        } catch (error) {
+            // Ignoramos errores de almacenamiento (modo incógnito, etc.)
+        }
+    };
+
+    const applyTheme = (theme) => {
+        const normalizedTheme = theme === 'dark' ? 'dark' : 'light';
+        rootElement.setAttribute('data-theme', normalizedTheme);
+
+        if (themeToggle) {
+            const label = normalizedTheme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+            themeToggle.setAttribute('aria-label', label);
+            themeToggle.setAttribute('aria-pressed', normalizedTheme === 'dark');
+            themeToggle.dataset.theme = normalizedTheme;
+        }
+    };
+
+    const detectPreferredTheme = () => {
+        const storedTheme = readStoredTheme();
+        if (storedTheme === 'light' || storedTheme === 'dark') {
+            return storedTheme;
+        }
+
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return prefersDark ? 'dark' : 'light';
+    };
+
+    const initialTheme = detectPreferredTheme();
+    applyTheme(initialTheme);
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = rootElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            storeTheme(nextTheme);
+        });
+    }
 
     const characterSets = {
         Mayusculas: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',

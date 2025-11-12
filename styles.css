@@ -9,6 +9,35 @@
     --success: #1e9e6b;
     --error: #d14352;
     --shadow: 0 20px 40px rgba(31, 31, 61, 0.08);
+    --border-color: rgba(95, 90, 246, 0.25);
+    --input-bg: #ffffff;
+    --secondary-bg: rgba(31, 31, 61, 0.06);
+    --secondary-bg-hover: rgba(31, 31, 61, 0.12);
+    --toggle-bg: rgba(255, 255, 255, 0.85);
+    --toggle-shadow: 0 10px 20px rgba(31, 31, 61, 0.12);
+    --toggle-hover-shadow: 0 16px 32px rgba(31, 31, 61, 0.18);
+    --switch-track: rgba(31, 31, 61, 0.15);
+}
+
+[data-theme="dark"] {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+    --card-bg: rgba(17, 24, 39, 0.88);
+    --text-primary: #f8fafc;
+    --text-secondary: #c7d2fe;
+    --accent: #8b5cf6;
+    --accent-soft: rgba(139, 92, 246, 0.16);
+    --accent-strong: #c4b5fd;
+    --success: #34d399;
+    --error: #f87171;
+    --shadow: 0 20px 40px rgba(15, 23, 42, 0.6);
+    --border-color: rgba(148, 163, 184, 0.35);
+    --input-bg: rgba(15, 23, 42, 0.85);
+    --secondary-bg: rgba(148, 163, 184, 0.14);
+    --secondary-bg-hover: rgba(148, 163, 184, 0.22);
+    --toggle-bg: rgba(15, 23, 42, 0.85);
+    --toggle-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+    --toggle-hover-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+    --switch-track: rgba(148, 163, 184, 0.35);
 }
 
 * {
@@ -32,8 +61,10 @@ body {
 }
 
 .hero {
+    position: relative;
     text-align: center;
     margin-bottom: 32px;
+    padding-top: 8px;
 }
 
 .hero h1 {
@@ -47,6 +78,58 @@ body {
     max-width: 540px;
     color: var(--text-secondary);
     font-size: 1rem;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    padding: 0;
+    background: var(--toggle-bg);
+    box-shadow: var(--toggle-shadow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-size: 1.35rem;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--toggle-hover-shadow);
+}
+
+.theme-toggle:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 4px;
+}
+
+.theme-toggle .icon {
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.theme-toggle .sun {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+.theme-toggle .moon {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+}
+
+[data-theme="dark"] .theme-toggle .moon {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+[data-theme="dark"] .theme-toggle .sun {
+    opacity: 0;
+    transform: scale(0.6) rotate(20deg);
 }
 
 .cards {
@@ -101,9 +184,9 @@ input[type="range"] {
 input[type="number"] {
     width: 80px;
     padding: 10px 12px;
-    border: 1px solid rgba(95, 90, 246, 0.25);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    background: white;
+    background: var(--input-bg);
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -141,7 +224,7 @@ input[type="number"] {
     width: 46px;
     height: 24px;
     border-radius: 16px;
-    background: rgba(31, 31, 61, 0.15);
+    background: var(--switch-track);
     transition: background 0.3s ease;
 }
 
@@ -202,13 +285,13 @@ button.primary:hover {
 }
 
 button.secondary {
-    background: rgba(31, 31, 61, 0.06);
+    background: var(--secondary-bg);
     color: var(--text-primary);
 }
 
 button.secondary:hover:not(:disabled) {
     transform: translateY(-1px);
-    background: rgba(31, 31, 61, 0.12);
+    background: var(--secondary-bg-hover);
 }
 
 button:disabled {
@@ -227,11 +310,11 @@ button:disabled {
     width: 100%;
     padding: 14px 16px;
     border-radius: 16px;
-    border: 1px solid rgba(95, 90, 246, 0.25);
+    border: 1px solid var(--border-color);
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
-    background: white;
+    background: var(--input-bg);
 }
 
 #emailAddress {
@@ -299,5 +382,14 @@ button:disabled {
 
     input[type="number"] {
         width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .theme-toggle {
+        top: -6px;
+        right: -6px;
+        width: 44px;
+        height: 44px;
     }
 }
