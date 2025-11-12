@@ -1,203 +1,303 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #f8f9ff 0%, #e8efff 50%, #f5e9ff 100%);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text-primary: #1f1f3d;
+    --text-secondary: #5a5a78;
+    --accent: #5f5af6;
+    --accent-soft: rgba(95, 90, 246, 0.14);
+    --accent-strong: #3d3ad1;
+    --success: #1e9e6b;
+    --error: #d14352;
+    --shadow: 0 20px 40px rgba(31, 31, 61, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
 
 body {
-    font-family: 'Roboto', sans-serif;
-    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+}
+
+.page {
+    width: min(1100px, 100%);
+}
+
+.hero {
     text-align: center;
-    background-color: #E4DCCF;
-    padding: 20px;
-    color: black;
+    margin-bottom: 32px;
 }
 
-.container {
-    max-width: 400px;
-    margin: 0 auto;
+.hero h1 {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    margin: 0;
+    font-weight: 700;
 }
 
-h2 {
-    margin-bottom: 15px;
+.hero p {
+    margin: 8px auto 0;
+    max-width: 540px;
+    color: var(--text-secondary);
+    font-size: 1rem;
 }
 
-.titulo_longitud{
-    margin-top: 30px;
+.cards {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
+.card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.card-header p {
+    margin: 8px 0 0;
+    color: var(--text-secondary);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.control-label {
+    font-weight: 600;
+}
+
+.length-inputs {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+}
+
+input[type="number"] {
+    width: 80px;
+    padding: 10px 12px;
+    border: 1px solid rgba(95, 90, 246, 0.25);
+    border-radius: 12px;
+    background: white;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
 }
 
 .checkbox-group {
-    text-align: left;
-    margin-top: 40px;
+    display: grid;
+    gap: 12px;
 }
 
-/* Estilos para los checkboxes */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-    background-color: #ccc;
-    border-radius: 20px;
+.checkbox {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--accent-soft);
+    border-radius: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
-    vertical-align: middle;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.switch::before {
-    content: "";
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background-color: white;
-    border-radius: 50%;
-    left: 2px;
-    top: 1px;
-    transition: left 0.3s ease-in-out;
+.checkbox:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(31, 31, 61, 0.08);
 }
 
-input[type="checkbox"]:checked + .switch::before {
-    left: 20px;
-}
-
-input[type="checkbox"] {
+.checkbox input[type="checkbox"] {
     display: none;
 }
 
-label.titulo_mayusculas,
-label.titulo_minusculas,
-label.titulo_numeros,
-label.titulo_simbolos {
+.checkbox .switch {
     position: relative;
+    width: 46px;
+    height: 24px;
+    border-radius: 16px;
+    background: rgba(31, 31, 61, 0.15);
+    transition: background 0.3s ease;
 }
 
-label.titulo_mayusculas .switch,
-label.titulo_minusculas .switch,
-label.titulo_numeros .switch,
-label.titulo_simbolos .switch {
-    margin-top: 0;
-}
-
-input[type="checkbox"]:checked + .switch {
-    background-color: #FF6D60;
-}
-
-input[type="checkbox"] + .switch {
-    background-color: #F7D060;
-}
-
-.switch-label {
+.checkbox .switch::after {
+    content: "";
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 40px;
-    height: 20px;
-    z-index: -1;
-    cursor: pointer;
+    top: 50%;
+    left: 4px;
+    transform: translate(0, -50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 4px 8px rgba(31, 31, 61, 0.15);
+    transition: transform 0.3s ease;
+}
+
+.checkbox input[type="checkbox"]:checked + .switch {
+    background: var(--accent);
+}
+
+.checkbox input[type="checkbox"]:checked + .switch::after {
+    transform: translate(20px, -50%);
+}
+
+.checkbox span:last-child {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.actions,
+.email-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 button {
-    background-color: #FF6D60;
-    color: black;
     border: none;
-    padding: 8px 16px;
+    border-radius: 14px;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 30px;
-    border-radius: 24px;
-    font-family: 'Roboto', sans-serif;
-    font-weight: bold;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-button:hover {
-    background-color: #F7D060;
+button.primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 10px 20px rgba(95, 90, 246, 0.35);
+}
+
+button.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(95, 90, 246, 0.35);
+    background: var(--accent-strong);
+}
+
+button.secondary {
+    background: rgba(31, 31, 61, 0.06);
+    color: var(--text-primary);
+}
+
+button.secondary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: rgba(31, 31, 61, 0.12);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.output-wrapper,
+.email-output {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 #passwordInput {
-    margin-top: 10px;
-    width: 20%;
-    padding: 8px;
-    font-size: 14px;
-    border-radius: 5px;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(95, 90, 246, 0.25);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: white;
 }
 
-#copiar {
-    background-color: #FF6D60;
-    color: black;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
-    margin-top: 20px;
-    border-radius: 24px;
-    font-family: 'Roboto', sans-serif;
-    font-weight: bold;
+#emailAddress {
+    font-size: 1.1rem;
+    font-weight: 600;
+    word-break: break-all;
 }
 
-#copiar:hover {
-    background-color: #F7D060;
+.email-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-strong);
+    text-decoration: none;
+    font-weight: 600;
 }
 
-#length {
-    display: inline-block;
-    width: 20%;
-    height: 25px;
-    vertical-align: middle;
-    border-radius: 5px;
-    margin-top: 10px;
+.email-link:hover {
+    text-decoration: underline;
 }
 
-#passwordInput {
-    display: inline-block;
-    width: 70%;
-    padding: 8px;
-    font-size: 14px;
-    vertical-align: middle;
-    margin-top: 20px;
+.helper-text {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
-/* Media Query para pantallas medianas */
-@media screen and (max-width: 991.98px) {
-    .container {
-        max-width: 100%;
-        display: flex;
+.status-message {
+    font-size: 0.9rem;
+    min-height: 1.2rem;
+    color: var(--text-secondary);
+    transition: color 0.2s ease, opacity 0.2s ease;
+    opacity: 0;
+}
+
+.status-message.visible {
+    opacity: 1;
+}
+
+.status-message[data-state="success"] {
+    color: var(--success);
+}
+
+.status-message[data-state="error"] {
+    color: var(--error);
+}
+
+.status-message[data-state="info"] {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 24px 12px;
+    }
+
+    .card {
+        padding: 24px;
+    }
+
+    .length-inputs {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
     }
 
-    h2 {
-        font-size: 24px;
-    }
-
-    .checkbox-group {
-        align-self: flex-start;
-        margin-left: 20%;
-    }
-
-    #length {
-        width: 15%;
-    }
-    #passwordInput {
-        width: 40%;
-    }
-    /* Ajuste para el botón de generar contraseña */
-    #generate {
-        margin-top: 30px;
-    }
-}
-
-/* Media Query para pantallas pequeñas */
-@media (max-width: 767px) {
-    .container {
-        max-width: 100%;
-    }
-
-    h2 {
-        font-size: 20px;
-    }
-
-    #length{
-        width: 20%;
-    }
-    #passwordInput {
-        width: 70%;
+    input[type="number"] {
+        width: 100%;
     }
 }

@@ -1,45 +1,93 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Generador de contraseñas</title>
     <link rel="icon" href="img/icono_candado.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h2 class="Titulo">Generador de Contraseñas</h2>
-        <label class="titulo_longitud" for="length">Longitud de Contraseña:</label>
-        <input type="number" id="length" value="20">
-        <br>
-        <div class="checkbox-group">
-            <label class="titulo_mayusculas">
-                <input type="checkbox" id="incluirMayusculas" checked>
-                <span class="switch"></span> Incluir mayúsculas
-            </label>
-            <br>
-            <label class="titulo_minusculas">
-                <input type="checkbox" id="incluirMinusculas" checked>
-                <span class="switch"></span> Incluir minúsculas
-            </label>
-            <br>
-            <label class="titulo_numeros">
-                <input type="checkbox" id="incluirNumeros" checked>
-                <span class="switch"></span> Incluir números
-            </label>
-            <br>
-            <label class="titulo_simbolos">
-                <input type="checkbox" id="incluirSimbolos" checked>
-                <span class="switch"></span> Incluir símbolos
-            </label>
-        </div>
-        <button id="generate">Generar Contraseña</button>
-        <input type="text" id="passwordInput" readonly>
-        <button id="copiar">Copiar Contraseña</button>
+    <div class="page">
+        <header class="hero">
+            <h1>Seguridad con un clic</h1>
+            <p>Genera contraseñas robustas y consigue correos temporales en segundos.</p>
+        </header>
+
+        <main class="cards">
+            <section class="card password-card">
+                <div class="card-header">
+                    <h2>Generador de Contraseñas</h2>
+                    <p>Personaliza la longitud y el tipo de caracteres para crear una contraseña única.</p>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="length">Longitud</label>
+                    <div class="length-inputs">
+                        <input type="range" id="lengthRange" min="6" max="64" value="20">
+                        <input type="number" id="length" min="6" max="64" value="20">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox">
+                        <input type="checkbox" id="incluirMayusculas" checked>
+                        <span class="switch" aria-hidden="true"></span>
+                        <span>Incluir mayúsculas</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" id="incluirMinusculas" checked>
+                        <span class="switch" aria-hidden="true"></span>
+                        <span>Incluir minúsculas</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" id="incluirNumeros" checked>
+                        <span class="switch" aria-hidden="true"></span>
+                        <span>Incluir números</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" id="incluirSimbolos" checked>
+                        <span class="switch" aria-hidden="true"></span>
+                        <span>Incluir símbolos</span>
+                    </label>
+                </div>
+
+                <div class="actions">
+                    <button id="generate" class="primary">Generar contraseña</button>
+                    <button id="copiar" class="secondary" type="button">Copiar</button>
+                </div>
+
+                <div class="output-wrapper">
+                    <input type="text" id="passwordInput" readonly aria-label="Contraseña generada">
+                    <span id="passwordStatus" class="status-message" role="status" aria-live="polite"></span>
+                </div>
+            </section>
+
+            <section class="card email-card">
+                <div class="card-header">
+                    <h2>Correo Temporal</h2>
+                    <p>Obtén un correo desechable usando el servicio gratuito de 1secmail.</p>
+                </div>
+
+                <div class="email-actions">
+                    <button id="generateEmail" class="primary" type="button">Generar correo temporal</button>
+                    <button id="copyEmail" class="secondary" type="button" disabled>Copiar</button>
+                </div>
+
+                <div class="email-output">
+                    <span id="emailAddress" aria-live="polite" aria-label="Correo temporal"></span>
+                    <a id="emailInboxLink" href="#" target="_blank" rel="noopener" class="email-link" hidden>Revisar bandeja</a>
+                    <span id="emailStatus" class="status-message" role="status" aria-live="polite"></span>
+                </div>
+
+                <p class="helper-text">La bandeja se abrirá en una nueva pestaña para consultar los mensajes recibidos.</p>
+            </section>
+        </main>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

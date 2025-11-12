@@ -1,71 +1,166 @@
-document.getElementById("generate").addEventListener("click", function() {
-    // Definición de caracteres
-    let caracteres = {
-        numeros: "0123456789",
-        minusculas: "abcdefghijklmnopqrstuvwxyz",
-        mayusculas: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-        simbolos: "!@#$%^&*()-_+=<>?~"
+document.addEventListener('DOMContentLoaded', () => {
+    const lengthRange = document.getElementById('lengthRange');
+    const lengthInput = document.getElementById('length');
+    const generateButton = document.getElementById('generate');
+    const passwordInput = document.getElementById('passwordInput');
+    const copyPasswordButton = document.getElementById('copiar');
+    const passwordStatus = document.getElementById('passwordStatus');
+
+    const generateEmailButton = document.getElementById('generateEmail');
+    const copyEmailButton = document.getElementById('copyEmail');
+    const emailAddress = document.getElementById('emailAddress');
+    const emailStatus = document.getElementById('emailStatus');
+    const emailInboxLink = document.getElementById('emailInboxLink');
+
+    const characterSets = {
+        Mayusculas: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        Minusculas: 'abcdefghijklmnopqrstuvwxyz',
+        Numeros: '0123456789',
+        Simbolos: '!@#$%^&*()-_+=<>?~'
     };
 
-    // Obtener la longitud deseada de la contraseña
-    const lengthInput = document.getElementById("length");
-    const longitud = parseInt(lengthInput.value);
-
-    // Array para almacenar los caracteres seleccionados
-    let seleccionCaracteres = [];
-
-    // Calcular el porcentaje por categoría
-    const porcentajePorCategoria = 100 / Object.keys(caracteres).length;
-
-    // Función para garantizar que una categoría contribuya con al menos el porcentaje especificado
-    const garantizarPorcentaje = function(categoria, porcentaje) {
-        const caracteresCategoria = caracteres[categoria].split('');
-        const cantidadMinima = Math.ceil(porcentaje * longitud / 100);
-        for (let i = 0; i < cantidadMinima; i++) {
-            const caracterAleatorio = caracteresCategoria[Math.floor(Math.random() * caracteresCategoria.length)];
-            seleccionCaracteres.push(caracterAleatorio);
+    const updateStatus = (element, message, type = 'info') => {
+        if (!element) return;
+        element.textContent = message;
+        element.dataset.state = type;
+        if (message) {
+            element.classList.add('visible');
+        } else {
+            element.classList.remove('visible');
         }
     };
 
-    // Obtener las categorías seleccionadas por el usuario
-    const categoriasSeleccionadas = Object.keys(caracteres).filter(categoria => document.getElementById("incluir" + categoria.charAt(0).toUpperCase() + categoria.slice(1)).checked);
+    const syncLengthInputs = value => {
+        const sanitizedValue = Math.min(Math.max(parseInt(value, 10) || 6, 6), 64);
+        lengthRange.value = sanitizedValue;
+        lengthInput.value = sanitizedValue;
+    };
 
-    // Garantizar que cada categoría contribuya con al menos el porcentaje adecuado
-    categoriasSeleccionadas.forEach(categoria => {
-        const porcentaje = categoriasSeleccionadas.length === 3 ? 33.33 : porcentajePorCategoria;
-        garantizarPorcentaje(categoria, porcentaje);
+    lengthRange.addEventListener('input', event => {
+        syncLengthInputs(event.target.value);
     });
 
-    // Completar el array con caracteres aleatorios para alcanzar la longitud deseada
-    while (seleccionCaracteres.length < longitud) {
-        const categoriaAleatoria = categoriasSeleccionadas[Math.floor(Math.random() * categoriasSeleccionadas.length)];
-        const porcentaje = categoriasSeleccionadas.length === 3 ? 33.33 : porcentajePorCategoria;
-        garantizarPorcentaje(categoriaAleatoria, porcentaje);
-    }
+    lengthInput.addEventListener('input', event => {
+        syncLengthInputs(event.target.value);
+    });
 
-    // Mezclar el array de caracteres
-    seleccionCaracteres = shuffleArray(seleccionCaracteres);
+    const getSelectedSets = () => {
+        return Object.keys(characterSets).filter(key => {
+            const checkbox = document.getElementById(`incluir${key}`);
+            return checkbox && checkbox.checked;
+        });
+    };
 
-    // Construir la contraseña final
-    let contraseñaGenerada = seleccionCaracteres.join('');
+    const buildPassword = (length, sets) => {
+        if (sets.length === 0) {
+            throw new Error('Selecciona al menos una categoría.');
+        }
 
-    // Establecer la contraseña generada en el campo de entrada
-    const passwordInputElement = document.getElementById("passwordInput");
-    passwordInputElement.value = contraseñaGenerada;
+        const pool = sets.map(set => characterSets[set]).join('');
+        const passwordCharacters = [];
+
+        // Aseguramos que al menos un carácter de cada conjunto esté presente
+        sets.forEach(set => {
+            const characters = characterSets[set];
+            const randomChar = characters[Math.floor(Math.random() * characters.length)];
+            passwordCharacters.push(randomChar);
+        });
+
+        for (let i = passwordCharacters.length; i < length; i += 1) {
+            const randomChar = pool[Math.floor(Math.random() * pool.length)];
+            passwordCharacters.push(randomChar);
+        }
+
+        for (let i = passwordCharacters.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [passwordCharacters[i], passwordCharacters[j]] = [passwordCharacters[j], passwordCharacters[i]];
+        }
+
+        return passwordCharacters.join('').slice(0, length);
+    };
+
+    generateButton.addEventListener('click', () => {
+        try {
+            const length = parseInt(lengthInput.value, 10);
+            const selectedSets = getSelectedSets();
+            const password = buildPassword(length, selectedSets);
+            passwordInput.value = password;
+            updateStatus(passwordStatus, 'Contraseña generada correctamente.', 'success');
+        } catch (error) {
+            updateStatus(passwordStatus, error.message, 'error');
+        }
+    });
+
+    const copyToClipboard = async (text) => {
+        if (!text) {
+            throw new Error('Nada para copiar aún.');
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    };
+
+    copyPasswordButton.addEventListener('click', async () => {
+        try {
+            await copyToClipboard(passwordInput.value);
+            updateStatus(passwordStatus, 'Contraseña copiada al portapapeles.', 'success');
+        } catch (error) {
+            updateStatus(passwordStatus, error.message, 'error');
+        }
+    });
+
+    const createInboxLink = (email) => {
+        const [login, domain] = email.split('@');
+        return `https://www.1secmail.com/?login=${encodeURIComponent(login)}&domain=${encodeURIComponent(domain)}`;
+    };
+
+    generateEmailButton.addEventListener('click', async () => {
+        updateStatus(emailStatus, 'Generando correo temporal…', 'info');
+        emailAddress.textContent = '';
+        emailInboxLink.hidden = true;
+        copyEmailButton.disabled = true;
+
+        try {
+            const response = await fetch('https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1');
+            if (!response.ok) {
+                throw new Error('No se pudo obtener el correo temporal.');
+            }
+
+            const data = await response.json();
+            const email = Array.isArray(data) ? data[0] : null;
+
+            if (!email) {
+                throw new Error('Respuesta inválida del servicio de correo.');
+            }
+
+            emailAddress.textContent = email;
+            emailInboxLink.href = createInboxLink(email);
+            emailInboxLink.hidden = false;
+            copyEmailButton.disabled = false;
+            updateStatus(emailStatus, 'Correo temporal listo para usar.', 'success');
+        } catch (error) {
+            updateStatus(emailStatus, error.message, 'error');
+        }
+    });
+
+    copyEmailButton.addEventListener('click', async () => {
+        try {
+            await copyToClipboard(emailAddress.textContent);
+            updateStatus(emailStatus, 'Correo copiado al portapapeles.', 'success');
+        } catch (error) {
+            updateStatus(emailStatus, error.message, 'error');
+        }
+    });
 });
-
-// Manejar el evento de copiar al portapapeles
-document.getElementById("copiar").addEventListener("click", function() {
-    const passwordInputElement = document.getElementById("passwordInput");
-    passwordInputElement.select();
-    document.execCommand("copy");
-});
-
-// Función para mezclar un array
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
