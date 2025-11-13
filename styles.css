@@ -46,7 +46,7 @@ body {
 .dashboard__header {
     display: grid;
     gap: 1.75rem;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     align-items: stretch;
 }
 
@@ -108,11 +108,25 @@ body {
     box-shadow: 0 32px 60px rgba(2, 6, 23, 0.55);
 }
 
-.password-card {
+.generator-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    grid-column: span 2;
+}
+
+.breach-card {
     padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+@media (max-width: 960px) {
+    .generator-card {
+        grid-column: span 1;
+    }
 }
 
 .label {
@@ -190,6 +204,184 @@ body {
     margin: 0;
     font-size: 0.85rem;
     color: var(--color-text-muted);
+}
+
+.generator-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.slider-group label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-text-muted);
+}
+
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.slider-control input[type="range"] {
+    flex: 1;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.25);
+    outline: none;
+    position: relative;
+}
+
+.slider-control input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa, #38bdf8);
+    box-shadow: 0 4px 10px rgba(56, 189, 248, 0.45);
+    cursor: pointer;
+    border: none;
+}
+
+.slider-control input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa, #38bdf8);
+    box-shadow: 0 4px 10px rgba(56, 189, 248, 0.45);
+    cursor: pointer;
+    border: none;
+}
+
+.slider-control output {
+    min-width: 3ch;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--color-highlight);
+}
+
+.toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.85rem;
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    transition: border-color var(--transition-base), background var(--transition-base);
+}
+
+.toggle:hover {
+    border-color: rgba(96, 165, 250, 0.45);
+    background: rgba(30, 41, 59, 0.55);
+}
+
+.toggle input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.toggle-switch {
+    width: 46px;
+    height: 24px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.3);
+    position: relative;
+    transition: background var(--transition-base);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.4);
+    transition: transform var(--transition-base), background var(--transition-base);
+}
+
+.toggle input:checked + .toggle-switch {
+    background: rgba(56, 189, 248, 0.35);
+}
+
+.toggle input:checked + .toggle-switch::after {
+    transform: translateX(20px);
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(59, 130, 246, 0.95));
+}
+
+.toggle-label {
+    font-size: 0.95rem;
+    color: var(--color-text);
+}
+
+.generator-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    align-items: center;
+}
+
+.copy-button {
+    padding: 0.7rem 1.15rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: var(--color-text);
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.copy-button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.icon-copy {
+    width: 1.1rem;
+    height: 1.1rem;
+    background-color: currentColor;
+    mask: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"%3E%3Crect width="12" height="12" x="9" y="9" rx="2" stroke-width="1.5"/%3E%3Cpath stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M15 9V7a2 2 0 00-2-2H7a2 2 0 00-2 2v6a2 2 0 002 2h2"/%3E%3C/svg%3E') center / contain no-repeat;
+}
+
+.generator-feedback {
+    min-height: 1.2rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    transition: color var(--transition-base);
+}
+
+.generator-feedback.feedback-success {
+    color: var(--color-strong);
+}
+
+.generator-feedback.feedback-warn {
+    color: var(--color-warning);
+}
+
+.generator-feedback.feedback-error {
+    color: var(--color-danger);
+}
+
+.breach-card .breach-status {
+    min-height: 3.5rem;
 }
 
 .tab-shell {
@@ -542,7 +734,7 @@ body {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
 
-    .password-card,
+    .generator-card,
     .branding {
         padding: 1.75rem;
     }

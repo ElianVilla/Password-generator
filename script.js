@@ -1,5 +1,14 @@
 const passwordInput = document.getElementById('passwordInput');
 const toggleVisibility = document.getElementById('toggleVisibility');
+const lengthSlider = document.getElementById('lengthSlider');
+const lengthDisplay = document.getElementById('lengthDisplay');
+const includeLowercase = document.getElementById('includeLowercase');
+const includeUppercase = document.getElementById('includeUppercase');
+const includeNumbers = document.getElementById('includeNumbers');
+const includeSymbols = document.getElementById('includeSymbols');
+const generateBtn = document.getElementById('generateBtn');
+const copyBtn = document.getElementById('copyBtn');
+const generatorFeedback = document.getElementById('generatorFeedback');
 const meterFill = document.getElementById('meterFill');
 const strengthLabel = document.getElementById('strengthLabel');
 const strengthScore = document.getElementById('strengthScore');
@@ -23,6 +32,7 @@ let breachTimer;
 let breachAbortController;
 let qrInstance;
 
+const generatorToggles = [includeLowercase, includeUppercase, includeNumbers, includeSymbols].filter(Boolean);
 const keyboardPatterns = ['qwerty', 'asdf', 'zxcv', '1q2w3e', 'qaz', 'wsx', 'wasd'];
 const commonWords = [
   'password', 'contraseña', 'admin', 'welcome', 'dragon', 'monkey', 'football', 'baseball', 'iloveyou',
@@ -42,11 +52,13 @@ init();
 
 function init() {
   setupTabs();
+  setupGenerator();
   setupPasswordField();
   setupQrModule();
   updateInsights('');
   updateStrength('');
   updateBruteForce('');
+  updateCopyState('');
 }
 
 function setupTabs() {
@@ -81,6 +93,7 @@ function setupPasswordField() {
     scheduleBreachCheck(password);
     updateQr(password);
     updateBruteForce(password);
+    updateCopyState(password);
   });
 
   toggleVisibility.addEventListener('click', () => {
@@ -89,6 +102,139 @@ function setupPasswordField() {
     toggleVisibility.classList.toggle('is-active', !showing);
     toggleVisibility.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
   });
+}
+
+function setupGenerator() {
+  if (!lengthSlider || !lengthDisplay || !generateBtn) {
+    return;
+  }
+
+  lengthDisplay.textContent = lengthSlider.value;
+  lengthSlider.addEventListener('input', () => {
+    lengthDisplay.textContent = lengthSlider.value;
+  });
+
+  generatorToggles.forEach((toggle) => {
+    toggle.addEventListener('change', updateGeneratorAvailability);
+  });
+
+  updateGeneratorAvailability();
+
+  generateBtn.addEventListener('click', () => {
+    const length = Number(lengthSlider.value);
+    const sets = getActiveCharSets();
+
+    if (sets.length === 0) {
+      setGeneratorFeedback('Selecciona al menos un grupo de caracteres para generar una contraseña.', 'warn');
+      return;
+    }
+
+    const password = buildPassword(length, sets);
+    passwordInput.value = password;
+    passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+    setGeneratorFeedback('Nueva contraseña generada y lista para analizar.', 'success');
+  });
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const value = passwordInput.value;
+      if (!value) {
+        setGeneratorFeedback('No hay contraseña para copiar. Escribe o genera una primero.', 'warn');
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(value);
+        setGeneratorFeedback('Contraseña copiada al portapapeles.', 'success');
+      } catch (error) {
+        setGeneratorFeedback('No se pudo copiar automáticamente, intenta hacerlo manualmente.', 'error');
+      }
+    });
+  }
+}
+
+function updateGeneratorAvailability() {
+  if (!generateBtn) return;
+  const available = generatorToggles.some((toggle) => toggle.checked);
+  generateBtn.disabled = !available;
+  if (!available) {
+    setGeneratorFeedback('Activa al menos una opción de caracteres para generar contraseñas seguras.', 'warn');
+  } else if (generatorFeedback) {
+    generatorFeedback.textContent = '';
+    generatorFeedback.className = 'generator-feedback';
+  }
+}
+
+function getActiveCharSets() {
+  const sets = [];
+  if (includeLowercase?.checked) {
+    sets.push({ key: 'lowercase', chars: 'abcdefghijklmnopqrstuvwxyz' });
+  }
+  if (includeUppercase?.checked) {
+    sets.push({ key: 'uppercase', chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' });
+  }
+  if (includeNumbers?.checked) {
+    sets.push({ key: 'numbers', chars: '0123456789' });
+  }
+  if (includeSymbols?.checked) {
+    sets.push({ key: 'symbols', chars: "!@#$%^&*()-_=+[]{}<>?/|~.,:;'\"`" });
+  }
+  return sets;
+}
+
+function buildPassword(length, sets) {
+  const pool = sets.map((set) => set.chars).join('');
+  if (!pool) return '';
+
+  const characters = [];
+
+  sets.forEach((set) => {
+    characters.push(pickRandomChar(set.chars));
+  });
+
+  for (let i = characters.length; i < length; i += 1) {
+    characters.push(pickRandomChar(pool));
+  }
+
+  shuffleArray(characters);
+  return characters.join('').slice(0, length);
+}
+
+function pickRandomChar(source) {
+  if (!source.length) return '';
+  const index = secureRandomIndex(source.length);
+  return source.charAt(index);
+}
+
+function secureRandomIndex(length) {
+  if (length <= 0) return 0;
+  const maxUint = 0xffffffff;
+  const limit = Math.floor((maxUint + 1) / length) * length;
+  const random = new Uint32Array(1);
+  let value;
+  do {
+    crypto.getRandomValues(random);
+    value = random[0];
+  } while (value >= limit);
+  return value % length;
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = secureRandomIndex(i + 1);
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function setGeneratorFeedback(message, type) {
+  if (!generatorFeedback) return;
+  generatorFeedback.textContent = message;
+  generatorFeedback.className = `generator-feedback feedback-${type}`;
+}
+
+function updateCopyState(password) {
+  if (!copyBtn) return;
+  copyBtn.disabled = !password;
 }
 
 function updateStrength(password) {

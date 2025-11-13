@@ -16,25 +16,81 @@
             <div class="branding">
                 <p class="eyebrow">Analítica en tiempo real</p>
                 <h1>Radar de Contraseñas</h1>
-                <p class="lead">Evalúa la fortaleza, analiza patrones peligrosos y descubre si tu contraseña se ha visto comprometida sin abandonar el modo oscuro.</p>
+                <p class="lead">Genera claves únicas, revisa filtraciones y visualiza información crítica en un panel oscuro y elegante.</p>
             </div>
-            <div class="password-card glass-card">
-                <label for="passwordInput" class="label">Contraseña a analizar</label>
+
+            <section class="generator-card glass-card" aria-labelledby="generatorTitle">
+                <header class="panel-header">
+                    <h2 id="generatorTitle">Generador de contraseñas</h2>
+                    <p>Crea contraseñas robustas y pásalas al instante por todo el radar de seguridad.</p>
+                </header>
+
                 <div class="password-field">
-                    <input id="passwordInput" type="password" placeholder="Escribe tu contraseña aquí" autocomplete="off" aria-describedby="passwordHelp">
+                    <input id="passwordInput" type="password" placeholder="Escribe o genera tu contraseña" autocomplete="off" aria-describedby="passwordHelp">
                     <button id="toggleVisibility" type="button" aria-label="Mostrar contraseña" class="ghost-button">
                         <span class="icon-eye" aria-hidden="true"></span>
                     </button>
                 </div>
                 <p id="passwordHelp" class="helper">Todos los cálculos ocurren localmente en tu navegador.</p>
-            </div>
+
+                <div class="generator-options">
+                    <div class="slider-group">
+                        <label for="lengthSlider">Longitud</label>
+                        <div class="slider-control">
+                            <input type="range" id="lengthSlider" min="8" max="40" value="16">
+                            <output id="lengthDisplay" for="lengthSlider">16</output>
+                        </div>
+                    </div>
+                    <div class="toggle-grid" role="group" aria-label="Tipos de caracteres">
+                        <label class="toggle">
+                            <input type="checkbox" id="includeLowercase" checked>
+                            <span class="toggle-switch" aria-hidden="true"></span>
+                            <span class="toggle-label">Minúsculas (a-z)</span>
+                        </label>
+                        <label class="toggle">
+                            <input type="checkbox" id="includeUppercase" checked>
+                            <span class="toggle-switch" aria-hidden="true"></span>
+                            <span class="toggle-label">Mayúsculas (A-Z)</span>
+                        </label>
+                        <label class="toggle">
+                            <input type="checkbox" id="includeNumbers" checked>
+                            <span class="toggle-switch" aria-hidden="true"></span>
+                            <span class="toggle-label">Números (0-9)</span>
+                        </label>
+                        <label class="toggle">
+                            <input type="checkbox" id="includeSymbols" checked>
+                            <span class="toggle-switch" aria-hidden="true"></span>
+                            <span class="toggle-label">Símbolos (!@#)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="generator-actions">
+                    <button id="generateBtn" class="primary-button" type="button">Generar contraseña</button>
+                    <button id="copyBtn" class="ghost-button copy-button" type="button" disabled>
+                        <span class="icon-copy" aria-hidden="true"></span>
+                        Copiar
+                    </button>
+                </div>
+                <p id="generatorFeedback" class="generator-feedback" role="status" aria-live="polite"></p>
+            </section>
+
+            <section class="breach-card glass-card" aria-labelledby="breachCardTitle">
+                <header class="panel-header">
+                    <h2 id="breachCardTitle">Verificador de filtraciones</h2>
+                    <p>Consultamos <span class="highlight">Have I Been Pwned</span> usando k-anonimato.</p>
+                </header>
+                <div class="breach-status" id="breachStatus" role="status" aria-live="polite">
+                    Introduce una contraseña para comprobar si ha aparecido en filtraciones conocidas.
+                </div>
+                <div class="breach-counter" id="breachCounter"></div>
+            </section>
         </header>
 
         <div class="tab-shell">
             <nav class="tab-list" role="tablist" aria-label="Herramientas de seguridad">
                 <button class="tab-button active" role="tab" aria-selected="true" aria-controls="strengthPanel" id="strengthTab" data-target="strengthPanel">Indicador de fuerza</button>
                 <button class="tab-button" role="tab" aria-selected="false" aria-controls="analysisPanel" id="analysisTab" data-target="analysisPanel">Analizador avanzado</button>
-                <button class="tab-button" role="tab" aria-selected="false" aria-controls="breachPanel" id="breachTab" data-target="breachPanel">Medidor de brechas</button>
                 <button class="tab-button" role="tab" aria-selected="false" aria-controls="qrPanel" id="qrTab" data-target="qrPanel">Código QR local</button>
                 <button class="tab-button" role="tab" aria-selected="false" aria-controls="brutePanel" id="bruteTab" data-target="brutePanel">Fuerza bruta</button>
             </nav>
@@ -75,19 +131,6 @@
                             </header>
                             <div id="recommendationsList" class="info-stack" role="list"></div>
                         </section>
-                    </div>
-                </article>
-
-                <article id="breachPanel" class="tab-panel" role="tabpanel" aria-labelledby="breachTab" hidden>
-                    <div class="panel-card glass-card">
-                        <header class="panel-header">
-                            <h2>Medidor de brechas</h2>
-                            <p>Consultamos la base de <span class="highlight">Have I Been Pwned</span> usando k-anonimato para mantener tu contraseña privada.</p>
-                        </header>
-                        <div class="breach-status" id="breachStatus" role="status" aria-live="polite">
-                            Introduce una contraseña para comprobar si ha aparecido en filtraciones conocidas.
-                        </div>
-                        <div class="breach-counter" id="breachCounter"></div>
                     </div>
                 </article>
 
