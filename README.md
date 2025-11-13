@@ -137,3 +137,4 @@ script.js
 ## 📜 Licencia
 
 Puedes usar y adaptar este proyecto libremente bajo la licencia que elijas.
+
