@@ -40,87 +40,89 @@
                 <p class="lead">Bienvenido a tu laboratorio de contraseñas: genera combinaciones únicas, monitorea brechas y visualiza hallazgos sin salir de este espacio seguro.</p>
             </div>
 
-            <section class="generator-card glass-card" aria-labelledby="generatorTitle">
-                <header class="panel-header">
-                    <h2 id="generatorTitle">
-                        <span class="panel-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false">
-                                <path d="M9.75 3v2.25m4.5-2.25v2.25m-9 3h13.5m-12 0h10.5l-1.458 9.833A2.25 2.25 0 0 1 13.566 21H8.934a2.25 2.25 0 0 1-2.226-1.917L5.25 8.25Zm9.75 0V3a1.5 1.5 0 0 0-1.5-1.5h-3a1.5 1.5 0 0 0-1.5 1.5v5.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </span>
-                        Generador de contraseñas
-                    </h2>
-                    <p>Activa el laboratorio para sintetizar claves robustas y enviarlas de inmediato al resto de módulos inteligentes.</p>
-                </header>
+            <div class="lab-suite">
+                <section class="generator-card glass-card" aria-labelledby="generatorTitle">
+                    <header class="panel-header">
+                        <h2 id="generatorTitle">
+                            <span class="panel-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false">
+                                    <path d="M9.75 3v2.25m4.5-2.25v2.25m-9 3h13.5m-12 0h10.5l-1.458 9.833A2.25 2.25 0 0 1 13.566 21H8.934a2.25 2.25 0 0 1-2.226-1.917L5.25 8.25Zm9.75 0V3a1.5 1.5 0 0 0-1.5-1.5h-3a1.5 1.5 0 0 0-1.5 1.5v5.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            Generador de contraseñas
+                        </h2>
+                        <p>Activa el laboratorio para sintetizar claves robustas y enviarlas de inmediato al resto de módulos inteligentes.</p>
+                    </header>
 
-                <div class="password-field">
-                    <input id="passwordInput" type="password" placeholder="Escribe o genera tu contraseña" autocomplete="off" aria-describedby="passwordHelp">
-                    <button id="toggleVisibility" type="button" aria-label="Mostrar contraseña" class="ghost-button">
-                        <span class="icon-eye" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <p id="passwordHelp" class="helper">Todos los cálculos ocurren localmente en tu navegador.</p>
+                    <div class="password-field">
+                        <input id="passwordInput" type="password" placeholder="Escribe o genera tu contraseña" autocomplete="off" aria-describedby="passwordHelp">
+                        <button id="toggleVisibility" type="button" aria-label="Mostrar contraseña" class="ghost-button">
+                            <span class="icon-eye" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <p id="passwordHelp" class="helper">Todos los cálculos ocurren localmente en tu navegador.</p>
 
-                <div class="generator-options">
-                    <div class="slider-group">
-                        <label for="lengthSlider">Longitud</label>
-                        <div class="slider-control">
-                            <input type="range" id="lengthSlider" min="8" max="40" value="16">
-                            <output id="lengthDisplay" for="lengthSlider">16</output>
+                    <div class="generator-options">
+                        <div class="slider-group">
+                            <label for="lengthSlider">Longitud</label>
+                            <div class="slider-control">
+                                <input type="range" id="lengthSlider" min="8" max="40" value="16">
+                                <output id="lengthDisplay" for="lengthSlider">16</output>
+                            </div>
+                        </div>
+                        <div class="toggle-grid" role="group" aria-label="Tipos de caracteres">
+                            <label class="toggle">
+                                <input type="checkbox" id="includeLowercase" checked>
+                                <span class="toggle-switch" aria-hidden="true"></span>
+                                <span class="toggle-label">Minúsculas (a-z)</span>
+                            </label>
+                            <label class="toggle">
+                                <input type="checkbox" id="includeUppercase" checked>
+                                <span class="toggle-switch" aria-hidden="true"></span>
+                                <span class="toggle-label">Mayúsculas (A-Z)</span>
+                            </label>
+                            <label class="toggle">
+                                <input type="checkbox" id="includeNumbers" checked>
+                                <span class="toggle-switch" aria-hidden="true"></span>
+                                <span class="toggle-label">Números (0-9)</span>
+                            </label>
+                            <label class="toggle">
+                                <input type="checkbox" id="includeSymbols" checked>
+                                <span class="toggle-switch" aria-hidden="true"></span>
+                                <span class="toggle-label">Símbolos (!@#)</span>
+                            </label>
                         </div>
                     </div>
-                    <div class="toggle-grid" role="group" aria-label="Tipos de caracteres">
-                        <label class="toggle">
-                            <input type="checkbox" id="includeLowercase" checked>
-                            <span class="toggle-switch" aria-hidden="true"></span>
-                            <span class="toggle-label">Minúsculas (a-z)</span>
-                        </label>
-                        <label class="toggle">
-                            <input type="checkbox" id="includeUppercase" checked>
-                            <span class="toggle-switch" aria-hidden="true"></span>
-                            <span class="toggle-label">Mayúsculas (A-Z)</span>
-                        </label>
-                        <label class="toggle">
-                            <input type="checkbox" id="includeNumbers" checked>
-                            <span class="toggle-switch" aria-hidden="true"></span>
-                            <span class="toggle-label">Números (0-9)</span>
-                        </label>
-                        <label class="toggle">
-                            <input type="checkbox" id="includeSymbols" checked>
-                            <span class="toggle-switch" aria-hidden="true"></span>
-                            <span class="toggle-label">Símbolos (!@#)</span>
-                        </label>
+
+                    <div class="generator-actions">
+                        <button id="generateBtn" class="primary-button" type="button">Generar contraseña</button>
+                        <button id="copyBtn" class="ghost-button copy-button" type="button" disabled>
+                            <span class="icon-copy" aria-hidden="true"></span>
+                            Copiar
+                        </button>
                     </div>
-                </div>
+                    <p id="generatorFeedback" class="generator-feedback" role="status" aria-live="polite"></p>
+                </section>
 
-                <div class="generator-actions">
-                    <button id="generateBtn" class="primary-button" type="button">Generar contraseña</button>
-                    <button id="copyBtn" class="ghost-button copy-button" type="button" disabled>
-                        <span class="icon-copy" aria-hidden="true"></span>
-                        Copiar
-                    </button>
-                </div>
-                <p id="generatorFeedback" class="generator-feedback" role="status" aria-live="polite"></p>
-            </section>
-
-            <section class="breach-card glass-card" aria-labelledby="breachCardTitle">
-                <header class="panel-header">
-                    <h2 id="breachCardTitle">
-                        <span class="panel-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false">
-                                <path d="M4.5 5.25 12 2l7.5 3.25V11a9.5 9.5 0 0 1-7.5 9.25A9.5 9.5 0 0 1 4.5 11V5.25Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                                <path d="M9.75 11.25 11.5 13l2.75-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </span>
-                        Verificador de filtraciones
-                    </h2>
-                    <p>Consultamos <span class="highlight">Have I Been Pwned</span> usando k-anonimato.</p>
-                </header>
-                <div class="breach-status" id="breachStatus" role="status" aria-live="polite">
-                    Introduce una contraseña para comprobar si ha aparecido en filtraciones conocidas.
-                </div>
-                <div class="breach-counter" id="breachCounter"></div>
-            </section>
+                <section class="breach-card glass-card" aria-labelledby="breachCardTitle">
+                    <header class="panel-header">
+                        <h2 id="breachCardTitle">
+                            <span class="panel-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false">
+                                    <path d="M4.5 5.25 12 2l7.5 3.25V11a9.5 9.5 0 0 1-7.5 9.25A9.5 9.5 0 0 1 4.5 11V5.25Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                    <path d="M9.75 11.25 11.5 13l2.75-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            Verificador de filtraciones
+                        </h2>
+                        <p>Consultamos <span class="highlight">Have I Been Pwned</span> usando k-anonimato.</p>
+                    </header>
+                    <div class="breach-status" id="breachStatus" role="status" aria-live="polite">
+                        Introduce una contraseña para comprobar si ha aparecido en filtraciones conocidas.
+                    </div>
+                    <div class="breach-counter" id="breachCounter"></div>
+                </section>
+            </div>
         </header>
 
         <div class="tab-shell">
