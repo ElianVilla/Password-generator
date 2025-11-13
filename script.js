@@ -5,10 +5,9 @@ const tabPanels = Array.from(document.querySelectorAll('.panel'));
 const passwordInputs = Array.from(document.querySelectorAll('[data-sync="password"]'));
 const generatorInput = document.getElementById('passwordInput');
 const hibpInput = document.getElementById('hibpPassword');
-const qrInput = document.getElementById('qrPassword');
 const bruteInput = document.getElementById('brutePassword');
 
-const toggleVisibility = document.getElementById('toggleVisibility');
+const visibilityToggles = Array.from(document.querySelectorAll('[data-visibility-target]'));
 const copyBtn = document.getElementById('copyBtn');
 const lengthSlider = document.getElementById('lengthSlider');
 const lengthDisplay = document.getElementById('lengthDisplay');
@@ -26,9 +25,6 @@ const strengthMessage = document.getElementById('strengthMessage');
 
 const breachStatus = document.getElementById('breachStatus');
 const breachCounter = document.getElementById('breachCounter');
-
-const qrContainer = document.getElementById('qrContainer');
-const downloadQrButton = document.getElementById('downloadQr');
 
 const bruteTargets = {
   cpu: { time: document.getElementById('cpuTime'), bar: document.getElementById('cpuBar'), rate: 1e7 },
@@ -57,7 +53,6 @@ const strengthLevels = [
 let currentPassword = '';
 let breachTimer;
 let breachAbortController;
-let qrInstance;
 
 init();
 
@@ -70,9 +65,8 @@ function init() {
   }
   setupPasswordSync();
   setupGeneratorControls();
-  setupVisibilityToggle();
+  setupVisibilityToggles();
   setupCopyButton();
-  setupQrModule();
   updateStrength('');
   updateBruteForce('');
   updateCopyState('');
@@ -106,12 +100,6 @@ function applyTheme(theme) {
     if (label) {
       label.textContent = isLight ? 'Modo claro' : 'Modo oscuro';
     }
-  }
-
-  if (qrInstance) {
-    qrInstance._htOption.colorDark = isLight ? '#0f172a' : '#E6F4FF';
-    qrInstance._htOption.colorLight = isLight ? '#ffffff' : '#121826';
-    updateQr(currentPassword);
   }
 }
 
@@ -181,13 +169,20 @@ function autoGenerateInitialPassword() {
   }
 }
 
-function setupVisibilityToggle() {
-  if (!toggleVisibility || !generatorInput) return;
-  toggleVisibility.addEventListener('click', () => {
-    const showing = generatorInput.type === 'text';
-    generatorInput.type = showing ? 'password' : 'text';
-    toggleVisibility.classList.toggle('is-active', !showing);
-    toggleVisibility.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+function setupVisibilityToggles() {
+  visibilityToggles.forEach((button) => {
+    const targetId = button.getAttribute('data-visibility-target');
+    if (!targetId) return;
+
+    const input = document.getElementById(targetId);
+    if (!input) return;
+
+    button.addEventListener('click', () => {
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      button.classList.toggle('is-active', !showing);
+      button.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+    });
   });
 }
 
@@ -261,15 +256,15 @@ function shuffleArray(array) {
 
 function setPassword(value, sourceField) {
   currentPassword = value;
+
+  // Corregido: ahora se actualizan TODOS los campos sincronizados,
+  // incluido el que originó el cambio (generador, HIBP, fuerza bruta…)
   passwordInputs.forEach((input) => {
-    if (input !== sourceField) {
-      input.value = value;
-    }
+    input.value = value;
   });
 
   updateStrength(value);
   updateBruteForce(value);
-  updateQr(value);
   updateCopyState(value);
   scheduleBreachCheck(value);
 }
@@ -505,55 +500,6 @@ async function sha1(message) {
   const hashBuffer = await crypto.subtle.digest('SHA-1', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-}
-
-function setupQrModule() {
-  if (typeof QRCode === 'undefined' || !qrContainer) {
-    return;
-  }
-
-  const isLightTheme = document.documentElement.dataset.theme === 'light';
-  qrInstance = new QRCode(qrContainer, {
-    text: ' ',
-    width: 220,
-    height: 220,
-    colorDark: isLightTheme ? '#0f172a' : '#E6F4FF',
-    colorLight: isLightTheme ? '#ffffff' : '#121826',
-    correctLevel: QRCode.CorrectLevel.H
-  });
-
-  if (downloadQrButton) {
-    downloadQrButton.addEventListener('click', () => {
-      const canvas = qrContainer.querySelector('canvas');
-      if (!canvas) return;
-      const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
-      link.download = 'password-qr.png';
-      link.click();
-    });
-  }
-}
-
-function updateQr(password) {
-  if (!qrInstance) {
-    return;
-  }
-
-  const normalized = password.trim();
-  if (!normalized) {
-    qrInstance.clear();
-    qrInstance.makeCode(' ');
-    if (downloadQrButton) {
-      downloadQrButton.disabled = true;
-    }
-    return;
-  }
-
-  qrInstance.clear();
-  qrInstance.makeCode(normalized);
-  if (downloadQrButton) {
-    downloadQrButton.disabled = false;
-  }
 }
 
 function updateBruteForce(password) {
