@@ -567,3 +567,4 @@ function formatTime(log10Seconds) {
   const formatter = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
   return `≈ ${formatter.format(value)} ${unit.name}`;
 }
+
