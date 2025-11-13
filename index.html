@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Radar de Contraseñas</title>
+    <title>Panel de Seguridad de Contraseñas</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="img/icono_candado.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,15 +14,29 @@
     <div class="dashboard">
         <header class="dashboard__header">
             <div class="branding">
-                <p class="eyebrow">Analítica en tiempo real</p>
-                <h1>Radar de Contraseñas</h1>
+                <div class="branding__top">
+                    <p class="eyebrow">Analítica en tiempo real</p>
+                    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar a modo claro">
+                        <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false">
+                                <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false">
+                                <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm0-16V1m0 22v-1m10-10h-1M3 12H2m17.07 7.07-.7-.7M5.64 5.64l-.7-.7m0 14.14.7-.7m12.73-12.73.7-.7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+                <h1>Panel de Seguridad de Contraseñas</h1>
                 <p class="lead">Genera claves únicas, revisa filtraciones y visualiza información crítica en un panel oscuro y elegante.</p>
             </div>
 
             <section class="generator-card glass-card" aria-labelledby="generatorTitle">
                 <header class="panel-header">
                     <h2 id="generatorTitle">Generador de contraseñas</h2>
-                    <p>Crea contraseñas robustas y pásalas al instante por todo el radar de seguridad.</p>
+                    <p>Crea contraseñas robustas y pásalas al instante por todo el panel de seguridad.</p>
                 </header>
 
                 <div class="password-field">

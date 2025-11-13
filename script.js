@@ -19,6 +19,7 @@ const breachStatus = document.getElementById('breachStatus');
 const breachCounter = document.getElementById('breachCounter');
 const downloadQrButton = document.getElementById('downloadQr');
 const qrContainer = document.getElementById('qrContainer');
+const themeToggle = document.getElementById('themeToggle');
 const bruteTargets = {
   cpu: { time: document.getElementById('cpuTime'), bar: document.getElementById('cpuBar'), rate: 1e7 },
   gpu: { time: document.getElementById('gpuTime'), bar: document.getElementById('gpuBar'), rate: 1e9 },
@@ -47,10 +48,12 @@ const strengthLevels = [
 ];
 
 const textEncoder = new TextEncoder();
+const THEME_STORAGE_KEY = 'password-dashboard-theme';
 
 init();
 
 function init() {
+  setupTheme();
   setupTabs();
   setupGenerator();
   setupPasswordField();
@@ -59,6 +62,38 @@ function init() {
   updateStrength('');
   updateBruteForce('');
   updateCopyState('');
+}
+
+function setupTheme() {
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  const initialTheme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'dark';
+  applyTheme(initialTheme);
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    });
+  }
+}
+
+function applyTheme(theme) {
+  const root = document.documentElement;
+  const normalizedTheme = theme === 'light' ? 'light' : 'dark';
+  root.dataset.theme = normalizedTheme;
+  const isLight = normalizedTheme === 'light';
+
+  if (themeToggle) {
+    themeToggle.classList.toggle('is-light', isLight);
+    themeToggle.setAttribute('aria-label', isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+  }
+
+  if (qrInstance) {
+    qrInstance._htOption.colorDark = isLight ? '#0f172a' : '#E6F4FF';
+    qrInstance._htOption.colorLight = isLight ? '#ffffff' : '#121826';
+    updateQr(passwordInput?.value || '');
+  }
 }
 
 function setupTabs() {
@@ -639,12 +674,14 @@ function setupQrModule() {
     return;
   }
 
+  const isLightTheme = document.documentElement.dataset.theme === 'light';
+
   qrInstance = new QRCode(qrContainer, {
     text: ' ',
     width: 200,
     height: 200,
-    colorDark: '#E6F4FF',
-    colorLight: '#121826',
+    colorDark: isLightTheme ? '#0f172a' : '#E6F4FF',
+    colorLight: isLightTheme ? '#ffffff' : '#121826',
     correctLevel: QRCode.CorrectLevel.H
   });
 
