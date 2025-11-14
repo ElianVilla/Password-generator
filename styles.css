@@ -55,6 +55,7 @@ body {
     transition: background 280ms ease, color 280ms ease;
 }
 
+/* Contenedor principal */
 .app-shell {
     width: min(1120px, 100%);
     display: flex;
@@ -62,6 +63,7 @@ body {
     gap: clamp(1.2rem, 2vw, 1.8rem);
 }
 
+/* Encabezado */
 .app-header {
     display: flex;
     align-items: center;
@@ -104,6 +106,7 @@ h1 {
     letter-spacing: -0.02em;
 }
 
+/* Botón de tema */
 .theme-toggle {
     display: inline-flex;
     align-items: center;
@@ -158,6 +161,7 @@ h1 {
     transform: translateY(-6px);
 }
 
+/* Menú de pestañas */
 .tab-nav {
     display: flex;
     gap: 0.6rem;
@@ -203,6 +207,21 @@ h1 {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.36), rgba(20, 184, 166, 0.24));
 }
 
+/* 🔹 Menú más compacto en móviles */
+@media (max-width: 480px) {
+    .tab-nav {
+        padding: 0.35rem;
+        gap: 0.35rem;
+    }
+
+    .tab-link {
+        min-width: 6.5rem;
+        padding: 0.5rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Contenedor de paneles */
 .panels {
     display: flex;
     flex-direction: column;
@@ -216,6 +235,7 @@ h1 {
     display: block;
 }
 
+/* Tarjeta de cada panel */
 .panel-card {
     background: var(--color-surface);
     border-radius: var(--radius-lg);
@@ -227,6 +247,7 @@ h1 {
     gap: clamp(1.2rem, 2vw, 1.8rem);
 }
 
+/* Campos e inputs generales */
 .field-group {
     display: flex;
     flex-direction: column;
@@ -238,9 +259,10 @@ h1 {
     color: var(--color-text);
 }
 
+/* Fila de contraseña + botones */
 .password-display {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto auto; /* input + ojo + copiar + generar */
     gap: 0.5rem;
     align-items: center;
 }
@@ -264,6 +286,7 @@ h1 {
     box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
 }
 
+/* Botones principales */
 .primary-button,
 .ghost-button {
     border-radius: calc(var(--radius-md) - 4px);
@@ -278,6 +301,13 @@ h1 {
     padding: 0.75rem 1.2rem;
 }
 
+/* Botón de generar compacto (junto a copiar) */
+.primary-button--compact {
+    padding-inline: 0.75rem;
+    font-size: 0.85rem;
+}
+
+/* Estilo botón principal */
 .primary-button {
     border: none;
     background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
@@ -295,6 +325,7 @@ h1 {
     transform: translateY(-2px);
 }
 
+/* Botón tipo "ghost" (ojo, copiar, etc.) */
 .ghost-button {
     border: 1px solid var(--color-border);
     background: rgba(15, 23, 42, 0.35);
@@ -321,6 +352,7 @@ h1 {
     height: 1.1rem;
 }
 
+/* Indicador fuerza de contraseña */
 .strength-widget {
     display: flex;
     flex-direction: column;
@@ -356,6 +388,7 @@ h1 {
     line-height: 1.5;
 }
 
+/* Controles del generador */
 .generator-grid {
     display: grid;
     gap: 1.2rem;
@@ -380,6 +413,7 @@ h1 {
     gap: 0.8rem;
 }
 
+/* Slider */
 input[type="range"] {
     flex: 1;
     appearance: none;
@@ -409,12 +443,20 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer;
 }
 
+/* Campo numérico de longitud (derecha del slider) */
 #lengthDisplay {
-    min-width: 2rem;
-    font-weight: 600;
+    width: 3.2rem;
+    padding: 0.25rem 0.45rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    background: var(--color-surface-strong);
     color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: right;
 }
 
+/* Checkboxes de tipos de caracteres */
 .toggle-grid {
     display: grid;
     gap: 0.75rem;
@@ -470,6 +512,7 @@ input[type="range"]::-moz-range-thumb {
     font-size: 0.95rem;
 }
 
+/* Mensaje de feedback del generador */
 .generator-actions {
     display: flex;
     flex-wrap: wrap;
@@ -499,6 +542,7 @@ input[type="range"]::-moz-range-thumb {
     color: var(--color-accent);
 }
 
+/* Bloque HIBP */
 .breach-status {
     padding: 1rem 1.1rem;
     border-radius: calc(var(--radius-md) - 2px);
@@ -534,6 +578,7 @@ input[type="range"]::-moz-range-thumb {
     }
 }
 
+/* Tarjetas de fuerza bruta */
 .attack-grid {
     display: grid;
     gap: 1rem;
@@ -587,17 +632,19 @@ input[type="range"]::-moz-range-thumb {
     transition: transform 240ms ease;
 }
 
-canvas {
-    max-width: 100%;
-    height: auto !important;
-}
-
+/* Ajustes en móviles para inputs y botones */
 @media (max-width: 640px) {
     .password-display {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .ghost-button {
+    .ghost-button,
+    .primary-button {
         width: 100%;
     }
+}
+
+canvas {
+    max-width: 100%;
+    height: auto !important;
 }

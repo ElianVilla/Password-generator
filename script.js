@@ -1,16 +1,30 @@
+// ---------------------------------------------
+// Script principal de Contraseña Lab
+// - Tema claro/oscuro
+// - Tabs
+// - Generador y fuerza
+// - HIBP
+// - Fuerza bruta
+// ---------------------------------------------
+
+// Referencias generales
 const themeToggle = document.getElementById('themeToggle');
 const tabButtons = Array.from(document.querySelectorAll('.tab-link'));
 const tabPanels = Array.from(document.querySelectorAll('.panel'));
 
+// Inputs sincronizados entre secciones
 const passwordInputs = Array.from(document.querySelectorAll('[data-sync="password"]'));
 const generatorInput = document.getElementById('passwordInput');
 const hibpInput = document.getElementById('hibpPassword');
 const bruteInput = document.getElementById('brutePassword');
 
+// Botones de ojo
 const visibilityToggles = Array.from(document.querySelectorAll('[data-visibility-target]'));
+
+// Controles del generador
 const copyBtn = document.getElementById('copyBtn');
 const lengthSlider = document.getElementById('lengthSlider');
-const lengthDisplay = document.getElementById('lengthDisplay');
+const lengthDisplay = document.getElementById('lengthDisplay'); // input number a la derecha
 const includeLowercase = document.getElementById('includeLowercase');
 const includeUppercase = document.getElementById('includeUppercase');
 const includeNumbers = document.getElementById('includeNumbers');
@@ -18,62 +32,81 @@ const includeSymbols = document.getElementById('includeSymbols');
 const generatorFeedback = document.getElementById('generatorFeedback');
 const generateBtn = document.getElementById('generateBtn');
 
+// Elementos de fuerza de contraseña
 const strengthFill = document.getElementById('strengthFill');
 const strengthLevel = document.getElementById('strengthLevel');
 const strengthScore = document.getElementById('strengthScore');
 const strengthMessage = document.getElementById('strengthMessage');
 
+// Elementos HIBP
 const breachStatus = document.getElementById('breachStatus');
 const breachCounter = document.getElementById('breachCounter');
 
+// Elementos de fuerza bruta
 const bruteTargets = {
   cpu: { time: document.getElementById('cpuTime'), bar: document.getElementById('cpuBar'), rate: 1e7 },
   gpu: { time: document.getElementById('gpuTime'), bar: document.getElementById('gpuBar'), rate: 1e9 },
   distributed: { time: document.getElementById('distributedTime'), bar: document.getElementById('distributedBar'), rate: 1e12 }
 };
 
+// Constantes y helpers
 const THEME_STORAGE_KEY = 'password-dashboard-theme';
 const textEncoder = new TextEncoder();
-
 const generatorToggles = [includeLowercase, includeUppercase, includeNumbers, includeSymbols].filter(Boolean);
+
+// Patrones que penalizan la contraseña
 const keyboardPatterns = ['qwerty', 'asdf', 'zxcv', '1q2w3e', 'qaz', 'wsx', 'wasd'];
 const commonWords = [
   'password', 'contraseña', 'admin', 'welcome', 'dragon', 'monkey', 'football', 'baseball', 'iloveyou',
   'qwerty', 'abc123', 'letmein', 'master', 'princess', 'azerty', 'clave', 'security', 'pass', 'login'
 ];
 
+// Rangos de fuerza según entropía
 const strengthLevels = [
-  { label: 'Muy débil', minEntropy: 0, color: 'var(--strength-red)', description: 'Añade longitud y variedad para incrementar la entropía.' },
-  { label: 'Débil', minEntropy: 36, color: 'var(--strength-orange)', description: 'Incorpora mayúsculas, números y símbolos para reforzarla.' },
-  { label: 'Media', minEntropy: 50, color: 'var(--strength-yellow)', description: 'Aceptable, pero podrías extenderla para mayor seguridad.' },
-  { label: 'Fuerte', minEntropy: 65, color: 'var(--strength-green)', description: 'Buena entropía y diversidad de caracteres.' },
-  { label: 'Muy fuerte', minEntropy: 80, color: 'var(--strength-blue)', description: 'Excelente. Difícil de predecir incluso con ataques avanzados.' }
+  { label: 'Muy débil',  minEntropy: 0,  color: 'var(--strength-red)',    description: 'Añade longitud y variedad para incrementar la entropía.' },
+  { label: 'Débil',      minEntropy: 36, color: 'var(--strength-orange)', description: 'Incorpora mayúsculas, números y símbolos para reforzarla.' },
+  { label: 'Media',      minEntropy: 50, color: 'var(--strength-yellow)', description: 'Aceptable, pero podrías extenderla para mayor seguridad.' },
+  { label: 'Fuerte',     minEntropy: 65, color: 'var(--strength-green)',  description: 'Buena entropía y diversidad de caracteres.' },
+  { label: 'Muy fuerte', minEntropy: 80, color: 'var(--strength-blue)',   description: 'Excelente. Difícil de predecir incluso con ataques avanzados.' }
 ];
 
 let currentPassword = '';
 let breachTimer;
 let breachAbortController;
 
+// longitud válida actual (para slider y generar)
+let lastValidLength = 20;
+
+// --------------------------------------------------
+// Inicio
+// --------------------------------------------------
 init();
 
 function init() {
-  setupTheme();
-  setupTabs();
+  setupTheme();           // Tema claro/oscuro
+  setupTabs();            // Tabs navegación
+
   const defaultTab = tabButtons.find((button) => button.classList.contains('active')) || tabButtons[0];
   if (defaultTab) {
     activateTab(defaultTab.dataset.target, defaultTab);
   }
-  setupPasswordSync();
+
+  setupPasswordSync();    // Sincronizar campos
   setupGeneratorControls();
   setupVisibilityToggles();
   setupCopyButton();
+
+  // Estado inicial sin contraseña
   updateStrength('');
   updateBruteForce('');
   updateCopyState('');
   resetBreachState();
-  autoGenerateInitialPassword();
+  // Importante: NO generamos una contraseña al cargar
 }
 
+/* ==============================
+   Tema claro / oscuro
+============================== */
 function setupTheme() {
   const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
   const initialTheme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'dark';
@@ -103,6 +136,9 @@ function applyTheme(theme) {
   }
 }
 
+/* ==============================
+   Navegación entre pestañas
+============================== */
 function setupTabs() {
   tabButtons.forEach((button) => {
     button.addEventListener('click', () => activateTab(button.dataset.target, button));
@@ -124,51 +160,220 @@ function activateTab(targetId, button) {
   });
 }
 
+/* ==============================
+   Sincronización de contraseñas
+============================== */
 function setupPasswordSync() {
   passwordInputs.forEach((input) => {
     input.addEventListener('input', (event) => {
-      setPassword(event.target.value, input);
+      setPassword(event.target.value);
     });
   });
 }
 
+/* ==============================
+   Generador de contraseñas
+============================== */
 function setupGeneratorControls() {
   if (!lengthSlider || !lengthDisplay || !generateBtn) return;
 
-  lengthDisplay.textContent = lengthSlider.value;
+  // Valores iniciales
+  lengthSlider.value = String(lastValidLength);
+  lengthDisplay.value = String(lastValidLength);
+
+  // Slider -> input numérico
   lengthSlider.addEventListener('input', () => {
-    lengthDisplay.textContent = lengthSlider.value;
+    const value = parseInt(lengthSlider.value, 10) || lastValidLength;
+    lastValidLength = value;
+    lengthDisplay.value = String(value);
+  });
+
+  // Input numérico -> slider (permitir estados intermedios)
+  lengthDisplay.addEventListener('input', () => {
+    const raw = lengthDisplay.value;
+
+    // Permitir borrar completamente sin forzar nada
+    if (raw === '') {
+      return;
+    }
+
+    let value = parseInt(raw, 10);
+    if (Number.isNaN(value)) {
+      return;
+    }
+
+    // Solo sincronizamos el slider si está dentro de rango
+    if (value >= 8 && value <= 60) {
+      lastValidLength = value;
+      lengthSlider.value = String(value);
+    }
+  });
+
+  // Al salir del campo, sí normalizamos al rango 8–60
+  lengthDisplay.addEventListener('blur', () => {
+    let value = parseInt(lengthDisplay.value, 10);
+
+    if (Number.isNaN(value)) {
+      value = lastValidLength;
+    }
+
+    value = Math.min(60, Math.max(8, value));
+    lastValidLength = value;
+    lengthDisplay.value = String(value);
+    lengthSlider.value = String(value);
   });
 
   generatorToggles.forEach((toggle) => {
     toggle.addEventListener('change', updateGeneratorAvailability);
   });
-
   updateGeneratorAvailability();
 
+  // Click en "Generar contraseña"
   generateBtn.addEventListener('click', () => {
     const sets = getActiveCharSets();
     if (sets.length === 0) {
-      setGeneratorFeedback('Selecciona al menos un grupo de caracteres para generar contraseñas seguras.', 'warn');
+      setGeneratorFeedback('Selecciona al menos un grupo de caracteres.', 'warn');
       return;
     }
-    const length = Number(lengthSlider.value);
+
+    const length = lastValidLength || 20;
     const password = buildPassword(length, sets);
-    setPassword(password, generatorInput);
-    generatorInput?.focus();
-    setGeneratorFeedback('Contraseña generada y sincronizada con todas las herramientas.', 'success');
+
+    // Actualiza todos los campos sincronizados
+    setPassword(password);
+
+    // Evitar abrir teclado en móvil: no hacemos focus al input
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      generatorInput?.blur();
+    }
+
+    setGeneratorFeedback('Contraseña generada y sincronizada.', 'success');
   });
 }
 
-function autoGenerateInitialPassword() {
-  const sets = getActiveCharSets();
-  if (generatorInput && lengthSlider && sets.length > 0) {
-    const password = buildPassword(Number(lengthSlider.value), sets);
-    setPassword(password, generatorInput);
-    setGeneratorFeedback('Contraseña inicial lista para analizar.', 'info');
+// Devuelve los tipos de caracteres activos
+function getActiveCharSets() {
+  const sets = [];
+  if (includeLowercase?.checked) sets.push('abcdefghijklmnopqrstuvwxyz');
+  if (includeUppercase?.checked) sets.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+  if (includeNumbers?.checked)   sets.push('0123456789');
+  if (includeSymbols?.checked)   sets.push("!@#$%^&*()-_=+[]{}<>?/|~.,:;'\"`");
+  return sets;
+}
+
+// Construye una contraseña segura
+function buildPassword(length, sets) {
+  if (sets.length === 0) return '';
+  const pool = sets.join('');
+  const characters = [];
+
+  // Garantizar al menos un carácter de cada tipo
+  sets.forEach((set) => {
+    characters.push(pickRandomChar(set));
+  });
+
+  // Rellenar el resto
+  for (let i = characters.length; i < length; i += 1) {
+    characters.push(pickRandomChar(pool));
+  }
+
+  // Mezclar
+  shuffleArray(characters);
+  return characters.join('').slice(0, length);
+}
+
+// Caracter aleatorio usando crypto
+function pickRandomChar(source) {
+  if (!source.length) return '';
+  const index = secureRandomIndex(source.length);
+  return source.charAt(index);
+}
+
+// Índice aleatorio seguro
+function secureRandomIndex(length) {
+  if (length <= 0) return 0;
+  const maxUint = 0xffffffff;
+  const limit = Math.floor((maxUint + 1) / length) * length;
+  const random = new Uint32Array(1);
+  let value;
+  do {
+    crypto.getRandomValues(random);
+    value = random[0];
+  } while (value >= limit);
+  return value % length;
+}
+
+// Mezcla array (Fisher–Yates)
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = secureRandomIndex(i + 1);
+    [array[i], array[j]] = [array[j], array[i]];
   }
 }
 
+/* ==============================
+   Estado común de la contraseña
+============================== */
+function setPassword(value) {
+  currentPassword = value;
+
+  // Actualizar todos los inputs sincronizados
+  passwordInputs.forEach((input) => {
+    input.value = value;
+  });
+
+  updateStrength(value);
+  updateBruteForce(value);
+  updateCopyState(value);
+  scheduleBreachCheck(value);
+}
+
+/* Feedback visual del generador */
+function updateGeneratorAvailability() {
+  if (!generateBtn) return;
+  const available = generatorToggles.some((toggle) => toggle.checked);
+  generateBtn.disabled = !available;
+  if (!available) {
+    setGeneratorFeedback('Activa al menos una opción de caracteres.', 'warn');
+  } else {
+    setGeneratorFeedback('', '');
+  }
+}
+
+function setGeneratorFeedback(message, type) {
+  if (!generatorFeedback) return;
+  generatorFeedback.textContent = message;
+  generatorFeedback.className = 'generator-feedback';
+  if (type) {
+    generatorFeedback.classList.add(`feedback-${type}`);
+  }
+}
+
+/* Copiar contraseña */
+function setupCopyButton() {
+  if (!copyBtn) return;
+  copyBtn.addEventListener('click', async () => {
+    if (!currentPassword) {
+      setGeneratorFeedback('No hay contraseña para copiar.', 'warn');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(currentPassword);
+      setGeneratorFeedback('Contraseña copiada al portapapeles.', 'success');
+    } catch {
+      setGeneratorFeedback('No se pudo copiar automáticamente.', 'error');
+    }
+  });
+}
+
+function updateCopyState(password) {
+  if (!copyBtn) return;
+  copyBtn.disabled = !password;
+}
+
+/* ==============================
+   Botones de ojo (mostrar/ocultar)
+============================== */
 function setupVisibilityToggles() {
   visibilityToggles.forEach((button) => {
     const targetId = button.getAttribute('data-visibility-target');
@@ -186,114 +391,9 @@ function setupVisibilityToggles() {
   });
 }
 
-function setupCopyButton() {
-  if (!copyBtn) return;
-  copyBtn.addEventListener('click', async () => {
-    if (!currentPassword) {
-      setGeneratorFeedback('No hay contraseña para copiar. Genera o escribe una primero.', 'warn');
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(currentPassword);
-      setGeneratorFeedback('Contraseña copiada al portapapeles.', 'success');
-    } catch (error) {
-      setGeneratorFeedback('No se pudo copiar automáticamente, hazlo manualmente.', 'error');
-    }
-  });
-}
-
-function getActiveCharSets() {
-  const sets = [];
-  if (includeLowercase?.checked) sets.push('abcdefghijklmnopqrstuvwxyz');
-  if (includeUppercase?.checked) sets.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-  if (includeNumbers?.checked) sets.push('0123456789');
-  if (includeSymbols?.checked) sets.push("!@#$%^&*()-_=+[]{}<>?/|~.,:;'\"`");
-  return sets;
-}
-
-function buildPassword(length, sets) {
-  if (sets.length === 0) return '';
-  const pool = sets.join('');
-  const characters = [];
-
-  sets.forEach((set) => {
-    characters.push(pickRandomChar(set));
-  });
-
-  for (let i = characters.length; i < length; i += 1) {
-    characters.push(pickRandomChar(pool));
-  }
-
-  shuffleArray(characters);
-  return characters.join('').slice(0, length);
-}
-
-function pickRandomChar(source) {
-  if (!source.length) return '';
-  const index = secureRandomIndex(source.length);
-  return source.charAt(index);
-}
-
-function secureRandomIndex(length) {
-  if (length <= 0) return 0;
-  const maxUint = 0xffffffff;
-  const limit = Math.floor((maxUint + 1) / length) * length;
-  const random = new Uint32Array(1);
-  let value;
-  do {
-    crypto.getRandomValues(random);
-    value = random[0];
-  } while (value >= limit);
-  return value % length;
-}
-
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i -= 1) {
-    const j = secureRandomIndex(i + 1);
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-function setPassword(value, sourceField) {
-  currentPassword = value;
-
-  // Corregido: ahora se actualizan TODOS los campos sincronizados,
-  // incluido el que originó el cambio (generador, HIBP, fuerza bruta…)
-  passwordInputs.forEach((input) => {
-    input.value = value;
-  });
-
-  updateStrength(value);
-  updateBruteForce(value);
-  updateCopyState(value);
-  scheduleBreachCheck(value);
-}
-
-function updateGeneratorAvailability() {
-  if (!generateBtn) return;
-  const available = generatorToggles.some((toggle) => toggle.checked);
-  generateBtn.disabled = !available;
-  if (!available) {
-    setGeneratorFeedback('Activa al menos una opción de caracteres para generar contraseñas.', 'warn');
-  } else {
-    setGeneratorFeedback('', '');
-  }
-}
-
-function setGeneratorFeedback(message, type) {
-  if (!generatorFeedback) return;
-  generatorFeedback.textContent = message;
-  generatorFeedback.className = 'generator-feedback';
-  if (type) {
-    generatorFeedback.classList.add(`feedback-${type}`);
-  }
-}
-
-function updateCopyState(password) {
-  if (!copyBtn) return;
-  copyBtn.disabled = !password;
-}
-
+/* ==============================
+   Fuerza de contraseña (entropía)
+============================== */
 function updateStrength(password) {
   if (!password) {
     strengthFill.style.width = '0%';
@@ -305,8 +405,13 @@ function updateStrength(password) {
   }
 
   const evaluation = evaluatePassword(password);
-  const level = strengthLevels.reduce((acc, item) => (evaluation.effectiveEntropy >= item.minEntropy ? item : acc), strengthLevels[0]);
-  const fillPercent = Math.max(6, Math.min(100, Math.round((evaluation.effectiveEntropy / 80) * 100)));
+  const level = strengthLevels.reduce(
+    (acc, item) => (evaluation.effectiveEntropy >= item.minEntropy ? item : acc),
+    strengthLevels[0]
+  );
+
+  // Barra 0%–100%
+  const fillPercent = Math.max(0, Math.min(100, Math.round((evaluation.effectiveEntropy / 80) * 100)));
 
   strengthFill.style.width = `${fillPercent}%`;
   strengthFill.style.setProperty('--fill-color', level.color);
@@ -315,6 +420,7 @@ function updateStrength(password) {
   strengthMessage.textContent = evaluation.message || level.description;
 }
 
+// Calcula entropía y penalizaciones
 function evaluatePassword(password) {
   const length = password.length;
   const hasLower = /[a-z]/.test(password);
@@ -347,13 +453,10 @@ function evaluatePassword(password) {
     message = 'Sin patrones evidentes. Mantén esta contraseña en secreto y única.';
   }
 
-  return {
-    entropy,
-    effectiveEntropy,
-    message
-  };
+  return { entropy, effectiveEntropy, message };
 }
 
+// Detección de patrones débiles
 function detectPatterns(password) {
   const lower = password.toLowerCase();
   const flags = [];
@@ -394,7 +497,9 @@ function detectPatterns(password) {
 
 function hasSequentialPattern(text) {
   const sequences = ['abcdefghijklmnopqrstuvwxyz', '0123456789'];
-  return sequences.some((sequence) => containsSequence(text, sequence) || containsSequence(text, reverse(sequence)));
+  return sequences.some(
+    (sequence) => containsSequence(text, sequence) || containsSequence(text, reverse(sequence))
+  );
 }
 
 function containsSequence(text, sequence) {
@@ -427,14 +532,14 @@ function looksLikeSubstitution(lower) {
   return detectCommonWord(normalized);
 }
 
+/* ==============================
+   HIBP (Have I Been Pwned)
+============================== */
 function scheduleBreachCheck(password) {
   if (!breachStatus || !breachCounter) return;
-  if (breachTimer) {
-    clearTimeout(breachTimer);
-  }
-  if (breachAbortController) {
-    breachAbortController.abort();
-  }
+
+  if (breachTimer) clearTimeout(breachTimer);
+  if (breachAbortController) breachAbortController.abort();
 
   if (!password) {
     resetBreachState();
@@ -444,13 +549,12 @@ function scheduleBreachCheck(password) {
   breachStatus.innerHTML = '<span class="spinner" aria-hidden="true"></span> Consultando Have I Been Pwned...';
   breachCounter.textContent = '';
 
+  // Delay para no llamar a la API en cada tecla
   breachTimer = setTimeout(async () => {
     try {
       await performBreachCheck(password);
     } catch (error) {
-      if (error.name === 'AbortError') {
-        return;
-      }
+      if (error.name === 'AbortError') return;
       breachStatus.textContent = 'No fue posible contactar con el servicio en este momento.';
     }
   }, 600);
@@ -495,6 +599,7 @@ async function performBreachCheck(password) {
   breachAbortController = undefined;
 }
 
+// SHA-1 para HIBP
 async function sha1(message) {
   const data = textEncoder.encode(message);
   const hashBuffer = await crypto.subtle.digest('SHA-1', data);
@@ -502,13 +607,16 @@ async function sha1(message) {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase();
 }
 
+/* ==============================
+   Fuerza bruta
+============================== */
 function updateBruteForce(password) {
   let charsetSize = 0;
   if (/[a-z]/.test(password)) charsetSize += 26;
   if (/[A-Z]/.test(password)) charsetSize += 26;
-  if (/\d/.test(password)) charsetSize += 10;
+  if (/\d/.test(password))   charsetSize += 10;
   if (/[^\w\s]/.test(password)) charsetSize += 33;
-  if (/\s/.test(password)) charsetSize += 1;
+  if (/\s/.test(password))   charsetSize += 1;
   charsetSize = Math.max(charsetSize, 1);
 
   if (!password) {
@@ -530,6 +638,7 @@ function updateBruteForce(password) {
   });
 }
 
+// Formatea el tiempo estimado
 function formatTime(log10Seconds) {
   if (!isFinite(log10Seconds)) {
     return 'Tiempo incalculable';
@@ -537,11 +646,11 @@ function formatTime(log10Seconds) {
 
   const units = [
     { name: 'segundos', log: 0 },
-    { name: 'minutos', log: Math.log10(60) },
-    { name: 'horas', log: Math.log10(3600) },
-    { name: 'días', log: Math.log10(86400) },
-    { name: 'años', log: Math.log10(31557600) },
-    { name: 'siglos', log: Math.log10(3155760000) }
+    { name: 'minutos',  log: Math.log10(60) },
+    { name: 'horas',    log: Math.log10(3600) },
+    { name: 'días',     log: Math.log10(86400) },
+    { name: 'años',     log: Math.log10(31557600) },
+    { name: 'siglos',   log: Math.log10(3155760000) }
   ];
 
   if (log10Seconds < -2) {
