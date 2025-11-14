@@ -12,6 +12,7 @@
 </head>
 <body>
     <div class="app-shell">
+        <!-- Encabezado de la app -->
         <header class="app-header">
             <div class="brand">
                 <span class="brand-icon" aria-hidden="true">
@@ -21,6 +22,7 @@
                 </span>
                 <h1>Contraseña Lab</h1>
             </div>
+            <!-- Botón para cambiar tema -->
             <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar a modo claro">
                 <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false">
@@ -36,6 +38,7 @@
             </button>
         </header>
 
+        <!-- Navegación entre herramientas -->
         <nav class="tab-nav" role="tablist" aria-label="Secciones del laboratorio">
             <button class="tab-link active" role="tab" aria-selected="true" aria-controls="panel-generator" id="tab-generator" data-target="panel-generator">Generador</button>
             <button class="tab-link" role="tab" aria-selected="false" aria-controls="panel-hibp" id="tab-hibp" data-target="panel-hibp">Verificador de filtraciones</button>
@@ -44,11 +47,12 @@
         </nav>
 
         <main class="panels">
-            <!-- GENERADOR -->
+            <!-- PANEL: GENERADOR -->
             <section id="panel-generator" class="panel active" role="tabpanel" aria-labelledby="tab-generator">
                 <div class="panel-card">
                     <div class="field-group">
                         <label for="passwordInput">Contraseña generada</label>
+                        <!-- Fila principal con input + ojo + copiar + generar -->
                         <div class="password-display">
                             <input
                                 id="passwordInput"
@@ -59,6 +63,7 @@
                                 autocomplete="off"
                                 maxlength="60"
                             >
+                            <!-- Botón de mostrar/ocultar -->
                             <button
                                 id="toggleVisibility"
                                 type="button"
@@ -70,15 +75,21 @@
                                     <path d="M12 5c-5 0-9 7-9 7s4 7 9 7 9-7 9-7-4-7-9-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" fill="currentColor"/>
                                 </svg>
                             </button>
+                            <!-- Botón de copiar -->
                             <button id="copyBtn" type="button" class="ghost-button" disabled>
                                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false" aria-hidden="true">
                                     <path d="M9 3a2 2 0 0 0-2 2v11h2V5h8V3H9Zm4 4a2 2 0 0 0-2 2v12h10V9h-8Zm-2 2h6v8h-6V9Z" fill="currentColor"/>
                                 </svg>
                                 Copiar
                             </button>
+                            <!-- Botón de generar junto al de copiar -->
+                            <button id="generateBtn" class="primary-button primary-button--compact" type="button">
+                                Generar contraseña
+                            </button>
                         </div>
                     </div>
 
+                    <!-- Indicador de fuerza -->
                     <div class="strength-widget" aria-live="polite">
                         <div class="strength-track" aria-hidden="true">
                             <span class="strength-fill" id="strengthFill"></span>
@@ -90,12 +101,22 @@
                         <p id="strengthMessage">Genera o escribe una contraseña para evaluar su entropía.</p>
                     </div>
 
+                    <!-- Controles del generador -->
                     <div class="generator-grid">
                         <div class="slider-group">
                             <label for="lengthSlider">Longitud</label>
                             <div class="slider-control">
+                                <!-- Slider de longitud -->
                                 <input type="range" id="lengthSlider" min="8" max="60" value="20">
-                                <output id="lengthDisplay" for="lengthSlider">20</output>
+                                <!-- Campo numérico editable a la derecha -->
+                                <input
+                                    id="lengthDisplay"
+                                    type="number"
+                                    min="8"
+                                    max="60"
+                                    value="20"
+                                    inputmode="numeric"
+                                >
                             </div>
                         </div>
                         <div class="toggle-grid" role="group" aria-label="Tipos de caracteres">
@@ -118,14 +139,14 @@
                         </div>
                     </div>
 
+                    <!-- Mensaje de feedback del generador -->
                     <div class="generator-actions">
-                        <button id="generateBtn" class="primary-button" type="button">Generar contraseña</button>
                         <p id="generatorFeedback" class="generator-feedback" role="status" aria-live="polite"></p>
                     </div>
                 </div>
             </section>
 
-            <!-- HIBP -->
+            <!-- PANEL: HIBP -->
             <section id="panel-hibp" class="panel" role="tabpanel" aria-labelledby="tab-hibp" hidden>
                 <div class="panel-card">
                     <div class="field-group">
@@ -160,7 +181,7 @@
                 </div>
             </section>
 
-            <!-- FUERZA BRUTA -->
+            <!-- PANEL: FUERZA BRUTA -->
             <section id="panel-brute" class="panel" role="tabpanel" aria-labelledby="tab-brute" hidden>
                 <div class="panel-card">
                     <div class="field-group">
@@ -210,7 +231,7 @@
         </main>
     </div>
 
-    <!-- Script QR eliminado -->
+    <!-- JS principal -->
     <script src="script.js" type="module"></script>
 </body>
 </html>
